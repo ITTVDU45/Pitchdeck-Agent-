@@ -8,3 +8,5 @@ npm run dev
 ```
 
 Siehe `docs/architecture/mvp-plan.md` und `docs/technische-codex-roadmap.md`.
+
+**Vercel:** Schritt-für-Schritt unter [`docs/deployment-vercel.md`](docs/deployment-vercel.md).
