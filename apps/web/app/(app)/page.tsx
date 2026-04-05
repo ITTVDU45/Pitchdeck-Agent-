@@ -2,7 +2,7 @@ import Link from "next/link"
 import { unstable_noStore as noStore } from "next/cache"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { getStore } from "@/lib/server/store"
+import { getStore, isUsingMemoryStoreFallback } from "@/lib/server/store"
 
 export const dynamic = "force-dynamic"
 
@@ -18,9 +18,10 @@ export default async function DashboardPage() {
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
           <p className="mt-2 max-w-2xl text-sm text-foreground/65">
-            MVP-Grundgerüst: Kunden anlegen, Discovery erfassen, Konzept und
-            Deck generieren, Share-Link erzeugen. Datenhaltung aktuell
-            In-Memory (pro Server-Prozess).
+            MVP: Kunden anlegen, Discovery, Konzept, Deck, Share.{" "}
+            {isUsingMemoryStoreFallback()
+              ? "Aktuell Memory-Fallback (keine DB-URL) – Daten nur temporär."
+              : "Daten in SQLite/Prisma (lokal) bzw. deiner DATABASE_URL."}
           </p>
         </div>
         <Link href="/clients/new">

@@ -21,6 +21,7 @@ import {
 import { buildPitchDeckFromConcept } from "@pitchdeck/core"
 import { buildScriptForSlide } from "@pitchdeck/core"
 import { getPrisma } from "./prisma"
+import type { AppDataStore } from "./store-types"
 
 function iso(d: Date): string {
   return d.toISOString()
@@ -237,7 +238,7 @@ function payloadTitle(payload: Slide["payload"]): string {
   }
 }
 
-export class PrismaAppStore {
+export class PrismaAppStore implements AppDataStore {
   get defaultOrganizationId(): string {
     throw new Error(
       "Use await store.defaultOrganizationIdAsync() — Prisma store is async",

@@ -28,7 +28,7 @@ Unter **Settings → Environment Variables** (mindestens für *Production*):
 |------|--------|
 | `OPENAI_API_KEY` | Optional – ohne Key nutzt die App den deterministischen Konzept-Fallback. |
 | `OPENAI_MODEL` | Optional, z. B. `gpt-4o-mini`. |
-| `DATABASE_URL` | **Erforderlich** für Prisma. Lokal in `apps/web/.env`: `file:./dev.db` (nach `npx prisma db push` im Ordner `apps/web`). Auf Vercel: **kein** dauerhaftes SQLite-Dateisystem – nutze z. B. [Turso](https://turso.tech/) (libSQL) oder Postgres und passe ggf. `provider` im Schema an. |
+| `DATABASE_URL` | **Optional auf Vercel:** Wenn leer oder `file:…` auf Vercel, nutzt die App automatisch einen **Memory-Fallback** (Seite lädt, Daten nicht dauerhaft). Für echte Persistenz: [Turso](https://turso.tech/), Neon, Supabase Postgres usw. und Schema-`provider` ggf. anpassen. Lokal: `file:./dev.db` in `apps/web/.env` + `npx prisma db push`. |
 
 ## Nach dem Deploy
 

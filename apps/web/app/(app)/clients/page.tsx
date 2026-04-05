@@ -2,7 +2,7 @@ import Link from "next/link"
 import { unstable_noStore as noStore } from "next/cache"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { getStore } from "@/lib/server/store"
+import { getStore, isUsingMemoryStoreFallback } from "@/lib/server/store"
 
 export const dynamic = "force-dynamic"
 
@@ -30,12 +30,13 @@ export default async function ClientsPage() {
         </Link>
       </div>
 
-      {process.env.VERCEL &&
-      process.env.DATABASE_URL?.startsWith("file:") ? (
+      {isUsingMemoryStoreFallback() ? (
         <p className="rounded-xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/90">
-          <strong className="font-medium">Hinweis:</strong> Auf Vercel ist ein
-          SQLite-Dateipfad meist nicht dauerhaft beschreibbar. Für Produktion
-          bitte z. B.{" "}
+          <strong className="font-medium">Demo-Modus:</strong> Es läuft kein
+          Prisma/SQLite (fehlende oder ungeeignete{" "}
+          <code className="rounded bg-black/30 px-1">DATABASE_URL</code>
+          ). Daten liegen nur im Arbeitsspeicher dieser Server-Instanz und gehen
+          bei Kaltstart verloren. Für dauerhafte Daten: z. B.{" "}
           <a
             className="underline"
             href="https://turso.tech/"
@@ -44,8 +45,7 @@ export default async function ClientsPage() {
           >
             Turso
           </a>{" "}
-          oder Postgres nutzen und <code className="rounded bg-black/30 px-1">DATABASE_URL</code>{" "}
-          setzen.
+          oder Postgres mit passender URL in Vercel hinterlegen.
         </p>
       ) : null}
 

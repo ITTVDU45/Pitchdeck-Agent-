@@ -4,7 +4,7 @@ Monorepo mit `apps/web` (Next.js 15) und `packages/core` (Domäne, Zod, In-Memor
 
 ```bash
 npm install
-cp .env.example .env   # DATABASE_URL für SQLite setzen (siehe .env.example)
+cp .env.example apps/web/.env   # DATABASE_URL (SQLite) – siehe .env.example
 cd apps/web && npx prisma db push && cd ../..
 npm run dev
 ```
