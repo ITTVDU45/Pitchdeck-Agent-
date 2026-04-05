@@ -1,0 +1,17 @@
+# Lokale PostgreSQL für Pitchdeck (optional)
+# Start: docker compose up -d
+# DATABASE_URL siehe apps/web/.env.example
+services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: pitchdeck
+      POSTGRES_PASSWORD: pitchdeck
+      POSTGRES_DB: pitchdeck
+    volumes:
+      - pitchdeck_pg:/var/lib/postgresql/data
+
+volumes:
+  pitchdeck_pg:

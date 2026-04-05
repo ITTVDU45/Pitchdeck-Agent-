@@ -4,7 +4,7 @@ Abgehakt im Code-Stand: siehe `docs/architecture/mvp-plan.md` (Phasen 0).
 
 ## Nächste Iterationen
 
-- [x] Prisma + SQLite (MVP-Mock-DB, `apps/web/prisma`) – für Cloud: Postgres/Turso
+- [x] Prisma + PostgreSQL (`apps/web/prisma`) – lokal: `docker-compose.yml` / Neon für Vercel
 - [ ] Auth + `organizationId` aus Session statt Default-Org
 - [ ] Slide-Payload-Editor pro Typ (Formulare + Zod)
 - [ ] PDF-Export-Job

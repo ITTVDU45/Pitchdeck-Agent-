@@ -4,14 +4,15 @@ Monorepo mit `apps/web` (Next.js 15) und `packages/core` (Domäne, Zod, In-Memor
 
 ```bash
 npm install
-cp .env.example apps/web/.env   # DATABASE_URL (SQLite) – siehe .env.example
+docker compose up -d
+cp apps/web/.env.example apps/web/.env
 cd apps/web && npx prisma db push && npm run db:seed && cd ../..
 npm run dev
 ```
 
-Optionaler **Testkunde** (IBS / Sicherheitstechnik / David Viu / ibs.de): wird mit `npm run db:seed` aus `apps/web/prisma/seed.ts` angelegt (idempotent).
+Optionaler **Testkunde** (IBS): `npm run db:seed` (idempotent).
 
-Datenbank: **Prisma + SQLite** (`apps/web/prisma/schema.prisma`). `DATABASE_URL` z. B. `file:./dev.db` (relativ zum `prisma/`-Ordner, siehe `.env.example`).
+Datenbank: **Prisma + PostgreSQL**. Zeilen zum Kopieren: **`ENV-VORLAGE.md`** und `apps/web/.env.example`.
 
 Siehe `docs/architecture/mvp-plan.md` und `docs/technische-codex-roadmap.md`.
 

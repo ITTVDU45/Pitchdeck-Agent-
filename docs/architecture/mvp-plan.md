@@ -111,7 +111,7 @@ Präfix `/api`, JSON, konsistente Fehlerform `{ error: string }`.
 
 - `POST /api/slide-scripts/[id]/request-audio` – liefert `501` + Hinweis ElevenLabs/Worker (Schnittstelle stub)
 
-**Stand jetzt:** Persistenz über **Prisma + SQLite** (`apps/web/prisma`), lokal mit `DATABASE_URL=file:./dev.db`. Für Produktion/Cloud: verwaltete DB (Postgres, Turso/libSQL, …) statt Datei-SQLite.
+**Stand jetzt:** Persistenz über **Prisma + PostgreSQL** (`apps/web/prisma`). Lokal z. B. Docker (`docker-compose.yml`) oder gehostete URL. Vercel: `DATABASE_URL` mit Postgres (Neon, Supabase, …) – siehe `ENV-VORLAGE.md`.
 
 ---
 

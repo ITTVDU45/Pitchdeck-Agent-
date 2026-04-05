@@ -6,7 +6,7 @@ const ORG_HEADER = "x-organization-id"
 
 /**
  * Prisma nur, wenn DATABASE_URL gesetzt ist und auf Vercel kein SQLite-Dateipfad
- * (file:… funktioniert auf Serverless nicht zuverlässig → sonst Memory-Fallback).
+ * (file:… → Memory-Fallback). Produktion: PostgreSQL-URL (Neon, Supabase, …).
  */
 function shouldUsePrisma(): boolean {
   const url = process.env.DATABASE_URL?.trim() ?? ""
