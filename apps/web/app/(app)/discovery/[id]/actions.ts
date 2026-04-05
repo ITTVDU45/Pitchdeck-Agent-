@@ -1,5 +1,6 @@
 "use server"
 
+import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { discoverySessionPatchSchema } from "@pitchdeck/core"
 import { getStore } from "@/lib/server/store"
@@ -41,6 +42,11 @@ export async function saveDiscoverySession(
   })
 
   store.patchDiscoverySession(discoveryId, patch)
+  const updated = store.getDiscoverySession(discoveryId)
+  if (updated) {
+    revalidatePath(`/discovery/${discoveryId}`)
+    revalidatePath(`/clients/${updated.clientId}`)
+  }
 }
 
 export async function generateConceptAction(discoveryId: string) {
@@ -50,5 +56,7 @@ export async function generateConceptAction(discoveryId: string) {
 
   const sections = await generateConceptSectionsWithOptionalOpenAI(session)
   const concept = store.createSolutionConceptFromDiscovery(discoveryId, sections)
+  revalidatePath(`/discovery/${discoveryId}`)
+  revalidatePath(`/clients/${session.clientId}`)
   redirect(`/concepts/${concept.id}`)
 }

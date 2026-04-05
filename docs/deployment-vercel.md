@@ -28,11 +28,12 @@ Unter **Settings → Environment Variables** (mindestens für *Production*):
 |------|--------|
 | `OPENAI_API_KEY` | Optional – ohne Key nutzt die App den deterministischen Konzept-Fallback. |
 | `OPENAI_MODEL` | Optional, z. B. `gpt-4o-mini`. |
+| `PITCHDECK_STORE_PATH` | Optional, z. B. `/tmp/pitchdeck-store.json` – schreibt den MVP-Datenstand in eine Datei, damit **alle** Serverless-Instanzen dieselben Kunden sehen (Demo only; `/tmp` ist nicht dauerhaft). Für echte Nutzung: Datenbank. |
 
 ## Nach dem Deploy
 
 - Jeder Push auf den konfigurierten Produktions-Branch (meist `main`) löst ein neues Deployment aus.
-- **Hinweis MVP:** Die App nutzt einen **In-Memory-Store** – Daten gehen bei Cold Starts/Neu-Deployments verloren. Für Dauerbetrieb: Datenbank wie in der Roadmap beschrieben.
+- **Hinweis MVP:** Ohne Datenbank und ohne `PITCHDECK_STORE_PATH` hat **jede** Serverless-Instanz eigenen Speicher – neu angelegte Kunden erscheinen in der Liste ggf. nicht. Setze `PITCHDECK_STORE_PATH=/tmp/pitchdeck-store.json` für eine einfache Demo, oder entwickle/teste lokal mit `npm run dev`.
 
 ## CLI (optional)
 

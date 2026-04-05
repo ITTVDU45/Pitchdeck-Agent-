@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { revalidatePath } from "next/cache"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { createClientBodySchema } from "@pitchdeck/core"
@@ -19,6 +20,8 @@ export default function NewClientPage() {
     const body = createClientBodySchema.parse(raw)
     const store = getStore()
     const client = store.createClient(store.defaultOrganizationId, body)
+    revalidatePath("/")
+    revalidatePath("/clients")
     redirect(`/clients/${client.id}`)
   }
 

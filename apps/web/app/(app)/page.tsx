@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { unstable_noStore as noStore } from "next/cache"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { getStore } from "@/lib/server/store"
@@ -6,6 +7,7 @@ import { getStore } from "@/lib/server/store"
 export const dynamic = "force-dynamic"
 
 export default async function DashboardPage() {
+  noStore()
   const store = getStore()
   const clients = store.listClients(store.defaultOrganizationId)
 

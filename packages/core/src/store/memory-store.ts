@@ -21,6 +21,19 @@ function nowIso(): string {
   return new Date().toISOString()
 }
 
+/** Vollständiger Speicherstand für JSON-Datei oder externe Persistenz */
+export interface SerializedStore {
+  defaultOrganizationId: string
+  organizations: [string, Organization][]
+  clients: [string, Client][]
+  discoverySessions: [string, DiscoverySession][]
+  solutionConcepts: [string, SolutionConcept][]
+  pitchDecks: [string, PitchDeck][]
+  slidesByDeck: [string, Slide[]][]
+  scriptsBySlide: [string, SlideScript[]][]
+  shareByToken: [string, ShareLink][]
+}
+
 export class MemoryStore {
   organizations = new Map<string, Organization>()
   clients = new Map<string, Client>()
@@ -31,7 +44,25 @@ export class MemoryStore {
   scriptsBySlide = new Map<string, SlideScript[]>()
   shareByToken = new Map<string, ShareLink>()
 
-  constructor() {
+  private persistHandler?: () => void
+
+  constructor(snapshot?: SerializedStore) {
+    if (snapshot) {
+      this.organizations = new Map(snapshot.organizations)
+      this.clients = new Map(snapshot.clients)
+      this.discoverySessions = new Map(snapshot.discoverySessions)
+      this.solutionConcepts = new Map(snapshot.solutionConcepts)
+      this.pitchDecks = new Map(snapshot.pitchDecks)
+      this.slidesByDeck = new Map(snapshot.slidesByDeck)
+      this.scriptsBySlide = new Map(snapshot.scriptsBySlide)
+      this.shareByToken = new Map(snapshot.shareByToken)
+      if (!this.organizations.has(snapshot.defaultOrganizationId)) {
+        throw new Error("INVALID_STORE_SNAPSHOT_ORG")
+      }
+      this.defaultOrganizationId = snapshot.defaultOrganizationId
+      return
+    }
+
     const org: Organization = {
       id: randomUUID(),
       name: "Default Organization",
@@ -43,6 +74,28 @@ export class MemoryStore {
   }
 
   readonly defaultOrganizationId: string
+
+  setPersistHandler(handler: () => void): void {
+    this.persistHandler = handler
+  }
+
+  toSnapshot(): SerializedStore {
+    return {
+      defaultOrganizationId: this.defaultOrganizationId,
+      organizations: [...this.organizations.entries()],
+      clients: [...this.clients.entries()],
+      discoverySessions: [...this.discoverySessions.entries()],
+      solutionConcepts: [...this.solutionConcepts.entries()],
+      pitchDecks: [...this.pitchDecks.entries()],
+      slidesByDeck: [...this.slidesByDeck.entries()],
+      scriptsBySlide: [...this.scriptsBySlide.entries()],
+      shareByToken: [...this.shareByToken.entries()],
+    }
+  }
+
+  private touch(): void {
+    this.persistHandler?.()
+  }
 
   listClients(organizationId: string): Client[] {
     return [...this.clients.values()].filter(
@@ -69,6 +122,7 @@ export class MemoryStore {
       updatedAt: ts,
     }
     this.clients.set(client.id, client)
+    this.touch()
     return client
   }
 
@@ -104,6 +158,7 @@ export class MemoryStore {
       updatedAt: ts,
     }
     this.discoverySessions.set(session.id, session)
+    this.touch()
     return session
   }
 
@@ -131,6 +186,7 @@ export class MemoryStore {
       updatedAt: nowIso(),
     }
     this.discoverySessions.set(id, updated)
+    this.touch()
     return updated
   }
 
@@ -168,6 +224,7 @@ export class MemoryStore {
       updatedAt: ts,
     }
     this.solutionConcepts.set(concept.id, concept)
+    this.touch()
     return concept
   }
 
@@ -184,6 +241,7 @@ export class MemoryStore {
       updatedAt: nowIso(),
     }
     this.solutionConcepts.set(id, updated)
+    this.touch()
     return updated
   }
 
@@ -254,6 +312,7 @@ export class MemoryStore {
 
     this.pitchDecks.set(deck.id, deck)
     this.slidesByDeck.set(deck.id, slides)
+    this.touch()
     return { deck, slides }
   }
 
@@ -283,6 +342,7 @@ export class MemoryStore {
     }
     const nextList = deckSlides.map((s) => (s.id === id ? updated : s))
     this.slidesByDeck.set(slide.pitchDeckId, nextList)
+    this.touch()
     return updated
   }
 
@@ -325,6 +385,7 @@ export class MemoryStore {
       this.scriptsBySlide.set(slide.id, [...existing, script])
       created.push(script)
     }
+    this.touch()
     return created
   }
 
@@ -346,6 +407,7 @@ export class MemoryStore {
       createdAt: ts,
     }
     this.scriptsBySlide.set(existing.slideId, [...list, next])
+    this.touch()
     return next
   }
 
@@ -363,6 +425,7 @@ export class MemoryStore {
     deck.status = "published"
     deck.updatedAt = nowIso()
     this.pitchDecks.set(pitchDeckId, deck)
+    this.touch()
     return link
   }
 

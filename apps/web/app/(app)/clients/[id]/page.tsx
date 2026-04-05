@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { revalidatePath } from "next/cache"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { getStore } from "@/lib/server/store"
@@ -25,6 +26,8 @@ export default async function ClientDetailPage({ params }: PageProps) {
       storeInner.defaultOrganizationId,
       id,
     )
+    revalidatePath("/clients")
+    revalidatePath(`/clients/${id}`)
     redirect(`/discovery/${session.id}`)
   }
 
