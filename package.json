@@ -10,6 +10,7 @@
     "build": "npm run build -w web",
     "lint": "npm run lint -w web",
     "start": "npm run start -w web",
-    "db:push": "npm run db:push -w web"
+    "db:push": "npm run db:push -w web",
+    "db:seed": "npm run db:seed -w web"
   }
 }
