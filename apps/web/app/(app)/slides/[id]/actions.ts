@@ -12,9 +12,9 @@ export async function updateSlide(
     title: input.title,
     notes: input.notes,
   })
-  const store = getStore()
-  store.patchSlide(slideId, patch)
-  const slide = store.getSlide(slideId)
+  const store = await getStore()
+  await store.patchSlide(slideId, patch)
+  const slide = await store.getSlide(slideId)
   if (slide) revalidatePath(`/decks/${slide.pitchDeckId}`)
   revalidatePath(`/slides/${slideId}`)
 }

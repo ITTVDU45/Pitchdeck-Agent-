@@ -7,16 +7,18 @@ interface RouteParams {
 
 export async function GET(request: Request, { params }: RouteParams) {
   const { id } = await params
-  const orgId = resolveOrganizationId(request)
-  const store = getStore()
-  const deck = store.getPitchDeck(id)
+  const orgId = await resolveOrganizationId(request)
+  const store = await getStore()
+  const deck = await store.getPitchDeck(id)
   if (!deck || deck.organizationId !== orgId) {
     return jsonError("DECK_NOT_FOUND", 404)
   }
-  const slides = store.listSlidesForDeck(id)
-  const scripts = slides.map((s) => ({
-    slideId: s.id,
-    latest: store.getLatestScriptForSlide(s.id) ?? null,
-  }))
+  const slides = await store.listSlidesForDeck(id)
+  const scripts = await Promise.all(
+    slides.map(async (s) => ({
+      slideId: s.id,
+      latest: (await store.getLatestScriptForSlide(s.id)) ?? null,
+    })),
+  )
   return jsonOk({ deck, slides, scripts })
 }

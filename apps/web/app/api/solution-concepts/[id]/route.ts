@@ -13,9 +13,9 @@ interface RouteParams {
 
 export async function GET(request: Request, { params }: RouteParams) {
   const { id } = await params
-  const orgId = resolveOrganizationId(request)
-  const store = getStore()
-  const concept = store.getSolutionConcept(id)
+  const orgId = await resolveOrganizationId(request)
+  const store = await getStore()
+  const concept = await store.getSolutionConcept(id)
   if (!concept || concept.organizationId !== orgId) {
     return jsonError("CONCEPT_NOT_FOUND", 404)
   }
@@ -25,14 +25,14 @@ export async function GET(request: Request, { params }: RouteParams) {
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
     const { id } = await params
-    const orgId = resolveOrganizationId(request)
-    const store = getStore()
-    const existing = store.getSolutionConcept(id)
+    const orgId = await resolveOrganizationId(request)
+    const store = await getStore()
+    const existing = await store.getSolutionConcept(id)
     if (!existing || existing.organizationId !== orgId) {
       return jsonError("CONCEPT_NOT_FOUND", 404)
     }
     const patch = solutionConceptPatchSchema.parse(await request.json())
-    const concept = store.patchSolutionConcept(id, patch)
+    const concept = await store.patchSolutionConcept(id, patch)
     return jsonOk({ concept })
   } catch (error) {
     const z = handleZodError(error)

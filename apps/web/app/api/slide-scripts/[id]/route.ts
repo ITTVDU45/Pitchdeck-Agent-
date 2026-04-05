@@ -13,9 +13,9 @@ interface RouteParams {
 
 export async function GET(request: Request, { params }: RouteParams) {
   const { id } = await params
-  const orgId = resolveOrganizationId(request)
-  const store = getStore()
-  const script = store.getSlideScriptById(id)
+  const orgId = await resolveOrganizationId(request)
+  const store = await getStore()
+  const script = await store.getSlideScriptById(id)
   if (!script || script.organizationId !== orgId) {
     return jsonError("SCRIPT_NOT_FOUND", 404)
   }
@@ -25,14 +25,14 @@ export async function GET(request: Request, { params }: RouteParams) {
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
     const { id } = await params
-    const orgId = resolveOrganizationId(request)
-    const store = getStore()
-    const existing = store.getSlideScriptById(id)
+    const orgId = await resolveOrganizationId(request)
+    const store = await getStore()
+    const existing = await store.getSlideScriptById(id)
     if (!existing || existing.organizationId !== orgId) {
       return jsonError("SCRIPT_NOT_FOUND", 404)
     }
     const patch = slideScriptPatchSchema.parse(await request.json())
-    const script = store.patchSlideScript(id, patch)
+    const script = await store.patchSlideScript(id, patch)
     return jsonOk({ script })
   } catch (error) {
     const z = handleZodError(error)

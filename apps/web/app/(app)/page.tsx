@@ -8,8 +8,9 @@ export const dynamic = "force-dynamic"
 
 export default async function DashboardPage() {
   noStore()
-  const store = getStore()
-  const clients = store.listClients(store.defaultOrganizationId)
+  const store = await getStore()
+  const orgId = await store.defaultOrganizationIdAsync()
+  const clients = await store.listClients(orgId)
 
   return (
     <div className="space-y-8">

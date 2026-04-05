@@ -4,9 +4,10 @@ import { handleZodError, jsonError, jsonOk, mapStoreError } from "@/lib/server/a
 
 export async function POST(request: Request) {
   try {
-    const orgId = resolveOrganizationId(request)
+    const orgId = await resolveOrganizationId(request)
     const body = createDiscoverySessionBodySchema.parse(await request.json())
-    const session = getStore().createDiscoverySession(
+    const store = await getStore()
+    const session = await store.createDiscoverySession(
       orgId,
       body.clientId,
       body.title,

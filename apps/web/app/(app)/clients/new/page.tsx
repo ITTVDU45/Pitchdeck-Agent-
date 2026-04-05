@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { createClientBodySchema } from "@pitchdeck/core"
-import { getStore } from "@/lib/server/store"
+import { getDefaultOrganizationId, getStore } from "@/lib/server/store"
 
 export default function NewClientPage() {
   async function createClient(formData: FormData) {
@@ -18,8 +18,9 @@ export default function NewClientPage() {
       notes: String(formData.get("notes") ?? "").trim() || undefined,
     }
     const body = createClientBodySchema.parse(raw)
-    const store = getStore()
-    const client = store.createClient(store.defaultOrganizationId, body)
+    const store = await getStore()
+    const orgId = await getDefaultOrganizationId()
+    const client = await store.createClient(orgId, body)
     revalidatePath("/")
     revalidatePath("/clients")
     redirect(`/clients/${client.id}`)

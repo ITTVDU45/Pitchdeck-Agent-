@@ -8,14 +8,14 @@ interface RouteParams {
 
 export async function POST(request: Request, { params }: RouteParams) {
   const { id } = await params
-  const orgId = resolveOrganizationId(request)
-  const store = getStore()
-  const session = store.getDiscoverySession(id)
+  const orgId = await resolveOrganizationId(request)
+  const store = await getStore()
+  const session = await store.getDiscoverySession(id)
   if (!session || session.organizationId !== orgId) {
     return jsonError("DISCOVERY_NOT_FOUND", 404)
   }
 
   const sections = await generateConceptSectionsWithOptionalOpenAI(session)
-  const concept = store.createSolutionConceptFromDiscovery(id, sections)
+  const concept = await store.createSolutionConceptFromDiscovery(id, sections)
   return jsonOk({ concept }, 201)
 }

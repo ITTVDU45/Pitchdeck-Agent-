@@ -13,19 +13,17 @@ interface PageProps {
 
 export default async function ClientDetailPage({ params }: PageProps) {
   const { id } = await params
-  const store = getStore()
-  const client = store.getClient(id)
+  const store = await getStore()
+  const client = await store.getClient(id)
   if (!client) redirect("/clients")
 
-  const sessions = store.listDiscoveryForClient(id)
+  const sessions = await store.listDiscoveryForClient(id)
 
   async function startDiscovery() {
     "use server"
-    const storeInner = getStore()
-    const session = storeInner.createDiscoverySession(
-      storeInner.defaultOrganizationId,
-      id,
-    )
+    const storeInner = await getStore()
+    const orgId = await storeInner.defaultOrganizationIdAsync()
+    const session = await storeInner.createDiscoverySession(orgId, id)
     revalidatePath("/clients")
     revalidatePath(`/clients/${id}`)
     redirect(`/discovery/${session.id}`)

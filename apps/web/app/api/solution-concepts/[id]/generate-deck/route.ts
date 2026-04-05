@@ -8,13 +8,13 @@ interface RouteParams {
 export async function POST(_request: Request, { params }: RouteParams) {
   try {
     const { id } = await params
-    const orgId = resolveOrganizationId(_request)
-    const store = getStore()
-    const concept = store.getSolutionConcept(id)
+    const orgId = await resolveOrganizationId(_request)
+    const store = await getStore()
+    const concept = await store.getSolutionConcept(id)
     if (!concept || concept.organizationId !== orgId) {
       return jsonError("CONCEPT_NOT_FOUND", 404)
     }
-    const { deck, slides } = store.createPitchDeckFromConcept(id)
+    const { deck, slides } = await store.createPitchDeckFromConcept(id)
     return jsonOk({ deck, slides }, 201)
   } catch (error) {
     const m = mapStoreError(error)

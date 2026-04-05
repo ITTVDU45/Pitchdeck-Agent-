@@ -10,14 +10,24 @@ interface PageProps {
 
 export default async function SharePresentationPage({ params }: PageProps) {
   const { token } = await params
-  const store = getStore()
-  const link = store.getShareLink(token)
+  const store = await getStore()
+  const link = await store.getShareLink(token)
   if (!link) notFound()
 
-  const deck = store.getPitchDeck(link.pitchDeckId)
+  const deck = await store.getPitchDeck(link.pitchDeckId)
   if (!deck) notFound()
 
-  const slides = store.listSlidesForDeck(link.pitchDeckId)
+  const slides = await store.listSlidesForDeck(link.pitchDeckId)
+
+  const scriptBySlide = new Map<
+    string,
+    Awaited<ReturnType<typeof store.getLatestScriptForSlide>>
+  >()
+  await Promise.all(
+    slides.map(async (s) => {
+      scriptBySlide.set(s.id, await store.getLatestScriptForSlide(s.id))
+    }),
+  )
 
   return (
     <div>
@@ -37,7 +47,7 @@ export default async function SharePresentationPage({ params }: PageProps) {
 
       <main className="mx-auto max-w-3xl space-y-16 px-4 py-12">
         {slides.map((slide, index) => {
-          const script = store.getLatestScriptForSlide(slide.id)
+          const script = scriptBySlide.get(slide.id)
           return (
             <section
               key={slide.id}

@@ -10,8 +10,8 @@ export async function saveDiscoverySession(
   discoveryId: string,
   formData: FormData,
 ) {
-  const store = getStore()
-  const existing = store.getDiscoverySession(discoveryId)
+  const store = await getStore()
+  const existing = await store.getDiscoverySession(discoveryId)
   if (!existing) throw new Error("DISCOVERY_NOT_FOUND")
 
   const parseTags = (prefix: string) => {
@@ -41,8 +41,8 @@ export async function saveDiscoverySession(
         : undefined,
   })
 
-  store.patchDiscoverySession(discoveryId, patch)
-  const updated = store.getDiscoverySession(discoveryId)
+  await store.patchDiscoverySession(discoveryId, patch)
+  const updated = await store.getDiscoverySession(discoveryId)
   if (updated) {
     revalidatePath(`/discovery/${discoveryId}`)
     revalidatePath(`/clients/${updated.clientId}`)
@@ -50,12 +50,15 @@ export async function saveDiscoverySession(
 }
 
 export async function generateConceptAction(discoveryId: string) {
-  const store = getStore()
-  const session = store.getDiscoverySession(discoveryId)
+  const store = await getStore()
+  const session = await store.getDiscoverySession(discoveryId)
   if (!session) throw new Error("DISCOVERY_NOT_FOUND")
 
   const sections = await generateConceptSectionsWithOptionalOpenAI(session)
-  const concept = store.createSolutionConceptFromDiscovery(discoveryId, sections)
+  const concept = await store.createSolutionConceptFromDiscovery(
+    discoveryId,
+    sections,
+  )
   revalidatePath(`/discovery/${discoveryId}`)
   revalidatePath(`/clients/${session.clientId}`)
   redirect(`/concepts/${concept.id}`)

@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  clients   Client[]
+}
+
+model Client {
+  id             String   @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  companyName    String
+  industry       String
+  contactName    String
+  contactRole    String?
+  website        String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  discoverySessions DiscoverySession[]
+}
+
+model DiscoverySession {
+  id             String   @id @default(uuid())
+  organizationId String
+  clientId       String
+  client         Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title          String
+  rawNotes       String   @default("")
+  painPointsJson String   @default("[]")
+  needsJson      String   @default("[]")
+  goalsJson      String   @default("[]")
+  processesJson  String   @default("[]")
+  techStackJson  String   @default("[]")
+  status         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  concepts       SolutionConcept[]
+
+  @@index([clientId])
+}
+
+model SolutionConcept {
+  id                 String   @id @default(uuid())
+  organizationId     String
+  discoverySessionId String
+  discoverySession   DiscoverySession @relation(fields: [discoverySessionId], references: [id], onDelete: Cascade)
+  version            Int
+  status             String
+  sectionsJson       String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  pitchDecks         PitchDeck[]
+
+  @@index([discoverySessionId])
+}
+
+model PitchDeck {
+  id                String   @id @default(uuid())
+  organizationId    String
+  solutionConceptId String
+  solutionConcept   SolutionConcept @relation(fields: [solutionConceptId], references: [id], onDelete: Cascade)
+  version           Int
+  title             String
+  audience          String
+  theme             String
+  status            String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  slides            Slide[]
+  shareLinks        ShareLink[]
+
+  @@index([solutionConceptId])
+}
+
+model Slide {
+  id             String   @id @default(uuid())
+  organizationId String
+  pitchDeckId    String
+  pitchDeck      PitchDeck @relation(fields: [pitchDeckId], references: [id], onDelete: Cascade)
+  orderIndex     Int
+  type           String
+  title          String
+  payloadJson    String
+  notes          String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  scripts        SlideScript[]
+
+  @@index([pitchDeckId])
+}
+
+model SlideScript {
+  id                      String   @id @default(uuid())
+  organizationId          String
+  slideId                 String
+  slide                   Slide @relation(fields: [slideId], references: [id], onDelete: Cascade)
+  version                 Int
+  speakingMode            String
+  text                    String
+  durationEstimateSeconds Int
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@index([slideId])
+}
+
+model ShareLink {
+  token          String   @id
+  organizationId String
+  pitchDeckId    String
+  pitchDeck      PitchDeck @relation(fields: [pitchDeckId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+
+  @@index([pitchDeckId])
+}

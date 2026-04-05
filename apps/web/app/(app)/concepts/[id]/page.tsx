@@ -11,12 +11,12 @@ interface PageProps {
 
 export default async function ConceptPage({ params }: PageProps) {
   const { id } = await params
-  const store = getStore()
-  const concept = store.getSolutionConcept(id)
+  const store = await getStore()
+  const concept = await store.getSolutionConcept(id)
   if (!concept) redirect("/clients")
 
-  const session = store.getDiscoverySession(concept.discoverySessionId)
-  const client = session ? store.getClient(session.clientId) : undefined
+  const session = await store.getDiscoverySession(concept.discoverySessionId)
+  const client = session ? await store.getClient(session.clientId) : undefined
 
   return (
     <div className="space-y-8">

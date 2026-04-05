@@ -15,8 +15,8 @@ Ein Klick-Deployment aus dieser Umgebung ist nicht möglich (Vercel-Zugang liegt
 4. **Root Directory:** `apps/web` → *Edit* → Ordner `apps/web` wählen und bestätigen.  
    Wichtig: Ohne diesen Schritt findet Vercel die Next.js-App nicht.
 5. **Framework Preset:** Next.js (wird erkannt).
-6. **Build Command:** `npm run build` (Standard).
-7. **Install Command:** `npm install` (Standard, läuft im Root `apps/web` – der lokale Pfad `file:../../packages/core` funktioniert so).
+6. **Build Command:** `npm run build` (führt `prisma generate` aus).
+7. **Install Command:** `npm install` (Standard, Workspace installiert `@pitchdeck/core` über `file:../../packages/core`).
 8. **Output:** bleibt leer (Next.js verwaltet das).
 9. **Deploy** klicken.
 
@@ -28,12 +28,13 @@ Unter **Settings → Environment Variables** (mindestens für *Production*):
 |------|--------|
 | `OPENAI_API_KEY` | Optional – ohne Key nutzt die App den deterministischen Konzept-Fallback. |
 | `OPENAI_MODEL` | Optional, z. B. `gpt-4o-mini`. |
-| `PITCHDECK_STORE_PATH` | Optional, z. B. `/tmp/pitchdeck-store.json` – schreibt den MVP-Datenstand in eine Datei, damit **alle** Serverless-Instanzen dieselben Kunden sehen (Demo only; `/tmp` ist nicht dauerhaft). Für echte Nutzung: Datenbank. |
+| `DATABASE_URL` | **Erforderlich** für Prisma. Lokal in `apps/web/.env`: `file:./dev.db` (nach `npx prisma db push` im Ordner `apps/web`). Auf Vercel: **kein** dauerhaftes SQLite-Dateisystem – nutze z. B. [Turso](https://turso.tech/) (libSQL) oder Postgres und passe ggf. `provider` im Schema an. |
 
 ## Nach dem Deploy
 
 - Jeder Push auf den konfigurierten Produktions-Branch (meist `main`) löst ein neues Deployment aus.
-- **Hinweis MVP:** Ohne Datenbank und ohne `PITCHDECK_STORE_PATH` hat **jede** Serverless-Instanz eigenen Speicher – neu angelegte Kunden erscheinen in der Liste ggf. nicht. Setze `PITCHDECK_STORE_PATH=/tmp/pitchdeck-store.json` für eine einfache Demo, oder entwickle/teste lokal mit `npm run dev`.
+- **Schema anwenden:** Bei verwalteter DB einmalig Migrationen/`db push` ausführen (je nach Hosting). Lokal: `cd apps/web && npx prisma db push`.
+- **Hinweis:** Die App speichert alle MVP-Daten in **Prisma** – nicht mehr im In-Memory-Store.
 
 ## CLI (optional)
 

@@ -11,11 +11,11 @@ interface PageProps {
 
 export default async function SlidePage({ params }: PageProps) {
   const { id } = await params
-  const store = getStore()
-  const slide = store.getSlide(id)
+  const store = await getStore()
+  const slide = await store.getSlide(id)
   if (!slide) redirect("/clients")
 
-  const deck = store.getPitchDeck(slide.pitchDeckId)
+  const deck = await store.getPitchDeck(slide.pitchDeckId)
 
   return (
     <div className="space-y-8">

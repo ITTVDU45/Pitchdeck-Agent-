@@ -7,12 +7,12 @@ interface RouteParams {
 
 export async function GET(request: Request, { params }: RouteParams) {
   const { id } = await params
-  const orgId = resolveOrganizationId(request)
-  const store = getStore()
-  const client = store.getClient(id)
+  const orgId = await resolveOrganizationId(request)
+  const store = await getStore()
+  const client = await store.getClient(id)
   if (!client || client.organizationId !== orgId) {
     return jsonError("CLIENT_NOT_FOUND", 404)
   }
-  const discoverySessions = store.listDiscoveryForClient(id)
+  const discoverySessions = await store.listDiscoveryForClient(id)
   return jsonOk({ client, discoverySessions })
 }

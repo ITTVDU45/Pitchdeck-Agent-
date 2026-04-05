@@ -111,7 +111,7 @@ Präfix `/api`, JSON, konsistente Fehlerform `{ error: string }`.
 
 - `POST /api/slide-scripts/[id]/request-audio` – liefert `501` + Hinweis ElevenLabs/Worker (Schnittstelle stub)
 
-**Hinweis MVP:** Persistenz = In-Memory-Singleton (Server). Für Produktion: Postgres + Queue gemäß Roadmap.
+**Stand jetzt:** Persistenz über **Prisma + SQLite** (`apps/web/prisma`), lokal mit `DATABASE_URL=file:./dev.db`. Für Produktion/Cloud: verwaltete DB (Postgres, Turso/libSQL, …) statt Datei-SQLite.
 
 ---
 

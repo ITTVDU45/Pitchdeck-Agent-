@@ -1,13 +1,19 @@
-import { getMemoryStore } from "@pitchdeck/core"
+import { getPrismaStore } from "./prisma-store"
 
 const ORG_HEADER = "x-organization-id"
 
-export function getStore() {
-  return getMemoryStore()
+export async function getStore() {
+  return getPrismaStore()
 }
 
-export function resolveOrganizationId(request: Request): string {
+export async function getDefaultOrganizationId(): Promise<string> {
+  return getPrismaStore().defaultOrganizationIdAsync()
+}
+
+export async function resolveOrganizationId(
+  request: Request,
+): Promise<string> {
   const fromHeader = request.headers.get(ORG_HEADER)?.trim()
   if (fromHeader) return fromHeader
-  return getStore().defaultOrganizationId
+  return getDefaultOrganizationId()
 }

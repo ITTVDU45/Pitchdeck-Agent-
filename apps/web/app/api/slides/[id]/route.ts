@@ -13,27 +13,27 @@ interface RouteParams {
 
 export async function GET(request: Request, { params }: RouteParams) {
   const { id } = await params
-  const orgId = resolveOrganizationId(request)
-  const store = getStore()
-  const slide = store.getSlide(id)
+  const orgId = await resolveOrganizationId(request)
+  const store = await getStore()
+  const slide = await store.getSlide(id)
   if (!slide || slide.organizationId !== orgId) {
     return jsonError("SLIDE_NOT_FOUND", 404)
   }
-  const latestScript = store.getLatestScriptForSlide(id)
+  const latestScript = await store.getLatestScriptForSlide(id)
   return jsonOk({ slide, latestScript })
 }
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
     const { id } = await params
-    const orgId = resolveOrganizationId(request)
-    const store = getStore()
-    const existing = store.getSlide(id)
+    const orgId = await resolveOrganizationId(request)
+    const store = await getStore()
+    const existing = await store.getSlide(id)
     if (!existing || existing.organizationId !== orgId) {
       return jsonError("SLIDE_NOT_FOUND", 404)
     }
     const patch = slidePatchSchema.parse(await request.json())
-    const slide = store.patchSlide(id, patch)
+    const slide = await store.patchSlide(id, patch)
     return jsonOk({ slide })
   } catch (error) {
     const z = handleZodError(error)

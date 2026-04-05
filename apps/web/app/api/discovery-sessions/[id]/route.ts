@@ -13,27 +13,27 @@ interface RouteParams {
 
 export async function GET(request: Request, { params }: RouteParams) {
   const { id } = await params
-  const orgId = resolveOrganizationId(request)
-  const store = getStore()
-  const session = store.getDiscoverySession(id)
+  const orgId = await resolveOrganizationId(request)
+  const store = await getStore()
+  const session = await store.getDiscoverySession(id)
   if (!session || session.organizationId !== orgId) {
     return jsonError("DISCOVERY_NOT_FOUND", 404)
   }
-  const latestConcept = store.getLatestConceptForSession(id)
+  const latestConcept = await store.getLatestConceptForSession(id)
   return jsonOk({ session, latestConcept })
 }
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
     const { id } = await params
-    const orgId = resolveOrganizationId(request)
-    const store = getStore()
-    const existing = store.getDiscoverySession(id)
+    const orgId = await resolveOrganizationId(request)
+    const store = await getStore()
+    const existing = await store.getDiscoverySession(id)
     if (!existing || existing.organizationId !== orgId) {
       return jsonError("DISCOVERY_NOT_FOUND", 404)
     }
     const patch = discoverySessionPatchSchema.parse(await request.json())
-    const session = store.patchDiscoverySession(id, patch)
+    const session = await store.patchDiscoverySession(id, patch)
     return jsonOk({ session })
   } catch (error) {
     const z = handleZodError(error)

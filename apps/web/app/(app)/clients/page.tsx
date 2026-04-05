@@ -8,8 +8,9 @@ export const dynamic = "force-dynamic"
 
 export default async function ClientsPage() {
   noStore()
-  const store = getStore()
-  const clients = store.listClients(store.defaultOrganizationId)
+  const store = await getStore()
+  const orgId = await store.defaultOrganizationIdAsync()
+  const clients = await store.listClients(orgId)
 
   return (
     <div className="space-y-6">
@@ -29,15 +30,22 @@ export default async function ClientsPage() {
         </Link>
       </div>
 
-      {process.env.VERCEL && !process.env.PITCHDECK_STORE_PATH ? (
+      {process.env.VERCEL &&
+      process.env.DATABASE_URL?.startsWith("file:") ? (
         <p className="rounded-xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/90">
-          <strong className="font-medium">Vercel / Serverless:</strong> Ohne
-          Datei-Persistenz (<code className="rounded bg-black/30 px-1">PITCHDECK_STORE_PATH</code>)
-          oder Datenbank hat jede Server-Instanz eigenen Speicher – neu angelegte
-          Kunden erscheinen in der Liste ggf. nicht. Für Demos lokal{" "}
-          <code className="rounded bg-black/30 px-1">npm run dev</code> nutzen
-          oder <code className="rounded bg-black/30 px-1">PITCHDECK_STORE_PATH</code>{" "}
-          auf ein beschreibbares Volume setzen.
+          <strong className="font-medium">Hinweis:</strong> Auf Vercel ist ein
+          SQLite-Dateipfad meist nicht dauerhaft beschreibbar. Für Produktion
+          bitte z. B.{" "}
+          <a
+            className="underline"
+            href="https://turso.tech/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Turso
+          </a>{" "}
+          oder Postgres nutzen und <code className="rounded bg-black/30 px-1">DATABASE_URL</code>{" "}
+          setzen.
         </p>
       ) : null}
 

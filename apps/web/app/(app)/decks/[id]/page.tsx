@@ -13,17 +13,27 @@ interface PageProps {
 
 export default async function DeckPage({ params }: PageProps) {
   const { id } = await params
-  const store = getStore()
-  const deck = store.getPitchDeck(id)
+  const store = await getStore()
+  const deck = await store.getPitchDeck(id)
   if (!deck) redirect("/clients")
 
-  const slides = store.listSlidesForDeck(id)
-  const share = store.getShareLinkForPitchDeck(id)
-  const concept = store.getSolutionConcept(deck.solutionConceptId)
+  const slides = await store.listSlidesForDeck(id)
+  const share = await store.getShareLinkForPitchDeck(id)
+  const concept = await store.getSolutionConcept(deck.solutionConceptId)
   const session = concept
-    ? store.getDiscoverySession(concept.discoverySessionId)
+    ? await store.getDiscoverySession(concept.discoverySessionId)
     : undefined
-  const client = session ? store.getClient(session.clientId) : undefined
+  const client = session ? await store.getClient(session.clientId) : undefined
+
+  const scriptBySlide = new Map<
+    string,
+    Awaited<ReturnType<typeof store.getLatestScriptForSlide>>
+  >()
+  await Promise.all(
+    slides.map(async (s) => {
+      scriptBySlide.set(s.id, await store.getLatestScriptForSlide(s.id))
+    }),
+  )
 
   return (
     <div className="space-y-8">
@@ -55,7 +65,7 @@ export default async function DeckPage({ params }: PageProps) {
       >
         <ul className="divide-y divide-white/10">
           {slides.map((s) => {
-            const script = store.getLatestScriptForSlide(s.id)
+            const script = scriptBySlide.get(s.id)
             return (
               <li
                 key={s.id}

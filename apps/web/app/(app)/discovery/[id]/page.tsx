@@ -11,11 +11,11 @@ interface PageProps {
 
 export default async function DiscoveryPage({ params }: PageProps) {
   const { id } = await params
-  const store = getStore()
-  const session = store.getDiscoverySession(id)
+  const store = await getStore()
+  const session = await store.getDiscoverySession(id)
   if (!session) redirect("/clients")
 
-  const client = store.getClient(session.clientId)
+  const client = await store.getClient(session.clientId)
 
   return (
     <div className="space-y-8">
